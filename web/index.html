@@ -1,0 +1,132 @@
+<html>
+    <head>
+    <title>WebSocket</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body{
+            padding:10px;
+            background: #898c90 !important;
+        }
+        #messageCome{
+            float:left;
+            
+        }
+        #messageDate{
+            float:right;
+            font-size:10px;
+        }
+        #clearboth{
+            clear: both;
+        }
+    </style>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        var webSocket = new WebSocket("ws://localhost:8080/WebSocket/chatServerEndpoint");
+        
+        webSocket.onmessage = function processMessage(incomingMessage)
+        {
+            var jsonData = JSON.parse(incomingMessage.data);
+            if(jsonData.messageType == "ChatMessage") 
+            {
+                //messagesTextArea.value += "<b>"+jsonData.name +"("+jsonData.location+"):</b> "+ jsonData.message + "\n";
+                $("#messagesTextAreadiv").html($("#messagesTextAreadiv").html()+"<b>"+escapeHtml(jsonData.name) +"("+escapeHtml(jsonData.location)+"):</b> "+ escapeHtml(jsonData.message)+"<br>");
+                
+            }
+            else if(jsonData.messageType == "UsersMessage")
+            {
+                usersTextArea.value ="";
+                var i=0;
+                while(i<jsonData.users.length)
+                {
+                    usersTextArea.value +=jsonData.users[i++]+ "\n";
+                }
+            }
+        }
+        
+        function send()
+        {
+            if($("#messagetextField").val().trim()!=null && $("#messagetextField").val().trim()!=undefined && $("#messagetextField").val().trim()!="")
+            {
+                webSocket.send(JSON.stringify({'message' : messagetextField.value, 'location': locationSelect.value}));
+                locationSelect.disabled="true";
+                messagetextField.value="";
+
+           }
+        }
+        
+        window.onbeforeunload = function doSometing(){
+            webSocket.onclose = function(){};
+            webSocket.close();
+        };
+        $(document).ready(function(){
+            $("#messagetextField" ).keypress(function( event ) {
+                if ( event.which == 13 ) {
+                    
+                    send();
+                    
+                    $("#messagesTextAreadiv").animate({ scrollTop: $("#messagesTextAreadiv")[0].scrollHeight},0);
+                    
+                }
+            });
+        });
+ 
+        function escapeHtml(text) {
+         return text
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
+       }
+        
+        
+    </script>
+</head>
+<body>
+<div style="width: 100%; height:100%; display:block;">
+    <div style="width: 78%; float:left; text-align: center; height: 80%; margin-right:5px;">
+        <!-- <textarea id="messagesTextArea" class="form-control" readonly="readonly" style="width: 100%;height:80%;"></textarea><br> -->
+        
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title">Chat</h3>
+            </div>
+            <div class="panel-body" id="messagesTextAreadiv" style="text-align: left; height: 100%; overflow: auto; padding-bottom: 10px;"></div>
+          </div>
+    </div>
+    <div style="width: 20%; float:left; text-align: center; height: 80%;  margin-left:5px; ">
+         
+        <div class="panel panel-success">
+            <div class="panel-heading">
+              <h3 class="panel-title">Kullanıcılar</h3>
+            </div>
+            <div class="panel-body" style="text-align: left; height: 100%">
+                <textarea id="usersTextArea" class="form-control" readonly="readonly" style="width: 100%;height:100%;"></textarea>
+            </div>
+          </div>
+    </div>
+    <div style="clear:both;"></div>
+    <div style='color:whitesmoke;'>
+        <br>
+        <br>
+        Mesaj:
+        <br>
+        <input id="messagetextField" class="form-control" type="text" style="width: 80%; float:left;" autofocus/>
+        <select id="locationSelect"  class="form-control" style="width: 20%; float:left;">
+            <option value="Türkiye">Türkiye</option>
+            <option value="Diğer">Diğer</option>
+        </select>
+    </div>
+</div>
+    
+   
+</body>
+</html>
