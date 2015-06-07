@@ -39,6 +39,7 @@
                 //messagesTextArea.value += "<b>"+jsonData.name +"("+jsonData.location+"):</b> "+ jsonData.message + "\n";
                 $("#messagesTextAreadiv").html($("#messagesTextAreadiv").html()+"<b>"+escapeHtml(jsonData.name) +"("+escapeHtml(jsonData.location)+"):</b> "+ escapeHtml(jsonData.message)+"<br>");
                 
+                $("#messagesTextAreadiv").animate({ scrollTop: $("#messagesTextAreadiv")[0].scrollHeight},0);
             }
             else if(jsonData.messageType == "UsersMessage")
             {
@@ -69,11 +70,7 @@
         $(document).ready(function(){
             $("#messagetextField" ).keypress(function( event ) {
                 if ( event.which == 13 ) {
-                    
                     send();
-                    
-                    $("#messagesTextAreadiv").animate({ scrollTop: $("#messagesTextAreadiv")[0].scrollHeight},0);
-                    
                 }
             });
         });
