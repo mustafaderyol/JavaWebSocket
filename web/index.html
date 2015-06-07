@@ -85,9 +85,26 @@
        }
         
         
+        function promptName() {
+            var person = prompt("Adınız:", "");
+
+            if (person != null) {
+                webSocket.send(JSON.stringify({'message' : person, 'location': locationSelect.value}));
+                locationSelect.disabled="true";
+                messagetextField.value="";
+                
+                $("#messagetextField").removeAttr('disabled');
+                
+            }
+            else
+            {
+                promptName();
+            }
+        }
+        
     </script>
 </head>
-<body>
+<body onload="promptName()">
 <div style="width: 100%; height:100%; display:block;">
     <div style="width: 78%; float:left; text-align: center; height: 80%; margin-right:5px;">
         <!-- <textarea id="messagesTextArea" class="form-control" readonly="readonly" style="width: 100%;height:80%;"></textarea><br> -->
@@ -116,7 +133,7 @@
         <br>
         Mesaj:
         <br>
-        <input id="messagetextField" class="form-control" type="text" style="width: 80%; float:left;" autofocus/>
+        <input id="messagetextField" class="form-control" type="text" style="width: 80%; float:left;" disabled/>
         <select id="locationSelect"  class="form-control" style="width: 20%; float:left;">
             <option value="Türkiye">Türkiye</option>
             <option value="Diğer">Diğer</option>
